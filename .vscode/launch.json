@@ -12,7 +12,10 @@
       "console": "integratedTerminal",
       "justMyCode": true,
       "envFile": "${workspaceFolder}/.env",
-      "args": ["run", "function_inputs.json"]
+      // "args": ["run", "function_inputs.json"]
+      "args": ["run",
+        "{\"projectId\": \"ce21647bf2\", \"modelId\": \"base design\", \"versionId\": \"8a1fffe37d\", \"speckleServerUrl\": \"https://latest.speckle.systems\"}",
+        "{\"forbiddenSpeckleType\": \"Objects.Geometry.Brep\"}"]
     }
   ]
 }

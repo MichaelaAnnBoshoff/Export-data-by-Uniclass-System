@@ -20,7 +20,6 @@ from specklepy.transports.server import ServerTransport
 
 from main import FunctionInputs, automate_function
 
-
 def crypto_random_string(length: int) -> str:
     """Generate a semi crypto random string of a given length."""
     alphabet = string.ascii_letters + string.digits
