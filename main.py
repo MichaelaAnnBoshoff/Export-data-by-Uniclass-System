@@ -65,7 +65,7 @@ def automate_function(
     os.environ['CURL_CA_BUNDLE'] = certificate
 
     client = SpeckleClient(host=speckle_graphql)
-    account = get_account_from_token(TOKEN, speckle_graphql)
+    account = get_account_from_token(token, speckle_graphql)
 
     try:
         client.authenticate_with_account(account)
