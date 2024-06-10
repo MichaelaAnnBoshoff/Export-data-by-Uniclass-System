@@ -73,7 +73,7 @@ def automate_function(
         automate_context.mark_run_failed(f"""SpeckleWarning: Possibly invalid token - could not authenticate Speckle Client for server {speckle_graphql}. 
                                          Error: {e}""")
 
-    access_system_data = AccessSystemSpecificData(stream_url=STREAM_URL, stream_id=PROJECT_ID, server=speckle_graphql, token=TOKEN)
+    access_system_data = AccessSystemSpecificData(stream_url=STREAM_URL, stream_id=PROJECT_ID, server=speckle_graphql, token=token)
     access_system_data.process_speckle_data()
 
 
