@@ -1,5 +1,6 @@
 """Run integration tests with a speckle server."""
 import os
+import ssl
 import secrets
 import string
 
@@ -19,6 +20,7 @@ from specklepy.objects.base import Base
 from specklepy.transports.server import ServerTransport
 
 from main import FunctionInputs, automate_function
+
 
 def crypto_random_string(length: int) -> str:
     """Generate a semi crypto random string of a given length."""
@@ -65,7 +67,12 @@ def register_new_automation(
         "automationId": automation_id,
         "automationRevisionId": automation_revision_id,
     }
-    speckle_client.httpclient.execute(query, params)
+    try:
+        speckle_client.httpclient.execute(query, params)
+    except Exception as e:
+        print(f"Error during automation registration: {e}")
+        raise
+    # speckle_client.httpclient.execute(query, params)
 
 
 @pytest.fixture()
@@ -85,8 +92,28 @@ def speckle_server_url() -> str:
 
 
 @pytest.fixture()
-def test_client(speckle_server_url: str, speckle_token: str) -> SpeckleClient:
-    """Initialize a SpeckleClient for testing."""
+def speckle_ssl_cert() -> str:
+    """Provide a path to an SSL certificate for the test suite."""
+    env_var = "SPECKLE_SSL_CERT"
+    cert_path = os.getenv(env_var)
+    if not cert_path:
+        raise ValueError(f"Cannot run tests without a {env_var} environment variable")
+    return cert_path
+
+# @pytest.fixture()
+# def test_client(speckle_server_url: str, speckle_token: str) -> SpeckleClient:
+#     """Initialize a SpeckleClient for testing."""
+#     test_client = SpeckleClient(
+#         speckle_server_url, speckle_server_url.startswith("https")
+#     )
+#     test_client.authenticate_with_token(speckle_token)
+#     return test_client
+
+@pytest.fixture()
+def test_client(speckle_server_url: str, speckle_token: str, speckle_ssl_cert: str) -> SpeckleClient:
+    """Initialize a SpeckleClient for testing with SSL certificate."""
+    os.environ['CURL_CA_BUNDLE'] = speckle_ssl_cert
+    
     test_client = SpeckleClient(
         speckle_server_url, speckle_server_url.startswith("https")
     )

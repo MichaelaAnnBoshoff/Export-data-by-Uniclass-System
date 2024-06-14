@@ -1,7 +1,7 @@
 import requests
 import warnings
 import logging
-import pyodbc
+# import pyodbc
 import json
 import os
 

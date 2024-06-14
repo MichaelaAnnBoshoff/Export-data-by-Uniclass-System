@@ -56,12 +56,14 @@ def automate_function(
     TOKEN = client.account.token
     token = function_inputs.user_token
     PROJECT_ID = automate_context.automation_run_data.project_id
+    print(PROJECT_ID)
     VERSION_ID = automate_context.automation_run_data.version_id
     SERVER_URL = client.account.serverInfo.url
     STREAM_URL = f"{SERVER_URL}/projects/{PROJECT_ID}"
+    print(STREAM_URL)
 
-    certificate = 'cacert.crt'
-    speckle_graphql = os.getenv('https://latest.speckle.systems/graphql')
+    certificate = os.getenv(r"SPECKLE_SSL_CERT")
+    speckle_graphql = 'https://latest.speckle.systems/graphql'
     os.environ['CURL_CA_BUNDLE'] = certificate
 
     client = SpeckleClient(host=speckle_graphql)
