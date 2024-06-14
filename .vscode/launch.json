@@ -12,13 +12,8 @@
       "console": "integratedTerminal",
       "justMyCode": true,
       "envFile": "${workspaceFolder}/.env",
-      // "args": ["run", "function_inputs.json"]
-      "args": [
-        "run",
-        "{\"projectId\": \"843d07eb10\", \"modelId\": \"base design\", \"versionId\": \"2a32ccfee1\", \"speckleServerUrl\": \"https://latest.speckle.systems\"}",
-        // make sure to use camelCase for variable names
-        "{\"forbiddenSpeckleType\": \"Objects.Geometry.Brep\"}"
-      ]
+      "args": ["run", "function_inputs.json"]
+     
     }
   ]
 }
