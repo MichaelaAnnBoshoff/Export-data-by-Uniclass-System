@@ -8,7 +8,7 @@
       "name": "Speckle Automate function",
       "type": "debugpy",
       "request": "launch",
-      "program": "main.py",
+      "program": "${workspaceFolder}/main.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "envFile": "${workspaceFolder}/.env",
