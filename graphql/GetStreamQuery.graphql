@@ -1,0 +1,1 @@
+query Stream ($streamId: String!) {project(id: $streamId) {versions{items {createdAt message sourceApplication referencedObject}}}}

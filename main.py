@@ -51,23 +51,24 @@ def automate_function(
         function_inputs: An instance object matching the defined schema.
     """
 
-
+    print("The script has started.")
     client = automate_context.speckle_client
-    # TOKEN = client.account.token
-    token = function_inputs.user_token
+    TOKEN = client.account.token
+    # token = function_inputs.user_token
     PROJECT_ID = automate_context.automation_run_data.project_id
     print(PROJECT_ID)
     # VERSION_ID = automate_context.automation_run_data.version_id
     SERVER_URL = client.account.serverInfo.url
+    print(SERVER_URL)
     STREAM_URL = f"{SERVER_URL}/projects/{PROJECT_ID}"
     print(STREAM_URL)
 
-    certificate = "cacert.crt"
+    certificate = 'cacert.crt'
     speckle_graphql = 'https://latest.speckle.systems/graphql'
     os.environ['CURL_CA_BUNDLE'] = certificate
 
     client = SpeckleClient(host=speckle_graphql)
-    account = get_account_from_token(token, speckle_graphql)
+    account = get_account_from_token(TOKEN, speckle_graphql)
 
     try:
         client.authenticate_with_account(account)
@@ -75,7 +76,7 @@ def automate_function(
         automate_context.mark_run_failed(f"""SpeckleWarning: Possibly invalid token - could not authenticate Speckle Client for server {speckle_graphql}. 
                                          Error: {e}""")
 
-    access_system_data = AccessSystemSpecificData(stream_url=STREAM_URL, stream_id=PROJECT_ID, server=speckle_graphql, token=token)
+    access_system_data = AccessSystemSpecificData(stream_url=STREAM_URL, stream_id=PROJECT_ID, server=speckle_graphql, token=TOKEN)
     access_system_data.process_speckle_data()
 
 

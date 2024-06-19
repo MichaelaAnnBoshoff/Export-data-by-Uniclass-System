@@ -68,6 +68,9 @@ def register_new_automation(
         "automationRevisionId": automation_revision_id,
     }
     try:
+        print(f"Speckle client/httpclient: {speckle_client}")
+        print(f"Query: {query}")
+        print(f"Params: {params}")
         speckle_client.httpclient.execute(query, params)
     except Exception as e:
         print(f"Error during automation registration: {e}")
@@ -80,6 +83,7 @@ def speckle_token() -> str:
     """Provide a speckle token for the test suite."""
     env_var = "SPECKLE_TOKEN"
     token = os.getenv(env_var)
+    print(f"Token: {token}")
     if not token:
         raise ValueError(f"Cannot run tests without a {env_var} environment variable")
     return token
@@ -96,6 +100,7 @@ def speckle_ssl_cert() -> str:
     """Provide a path to an SSL certificate for the test suite."""
     env_var = "SPECKLE_SSL_CERT"
     cert_path = os.getenv(env_var)
+    print(f"Cert path: {cert_path}")
     if not cert_path:
         raise ValueError(f"Cannot run tests without a {env_var} environment variable")
     return cert_path
@@ -118,6 +123,9 @@ def test_client(speckle_server_url: str, speckle_token: str, speckle_ssl_cert: s
         speckle_server_url, speckle_server_url.startswith("https")
     )
     test_client.authenticate_with_token(speckle_token)
+    print(f"Test client speckle token: {speckle_token}")
+    print(f"Test client: {test_client}")
+    print(f"Test client info: {test_client.user}")
     return test_client
 
 
@@ -135,18 +143,24 @@ def automation_run_data(
 ) -> AutomationRunData:
     """Set up an automation context for testing."""
     project_id = test_client.stream.create("Automate function e2e test")
+    print(f"Project id: {project_id}")
     branch_name = "main"
 
     model = test_client.branch.get(project_id, branch_name, commits_limit=1)
     model_id: str = model.id
-
+    print(f"Model id: {model_id}")
+    print(f"Second test client: {test_client}")
     root_obj_id = operations.send(
         test_object, [ServerTransport(project_id, test_client)]
     )
+    print(f"Root object id: {root_obj_id}")
     version_id = test_client.commit.create(project_id, root_obj_id)
+    print(f"Version id: {version_id}")
     if isinstance(version_id, SpeckleException):
         raise version_id
 
+    print(f"Third test client: {test_client}")
+    print(f"Test object: {test_object}")
     automation_name = crypto_random_string(10)
     automation_id = crypto_random_string(10)
     automation_revision_id = crypto_random_string(10)
@@ -159,7 +173,7 @@ def automation_run_data(
         automation_name,
         automation_revision_id,
     )
-
+    print("Register new automation successful!!!!!!!!! SUCCESS")
     automation_run_id = crypto_random_string(10)
     function_id = crypto_random_string(10)
     function_revision = crypto_random_string(10)
@@ -183,11 +197,13 @@ def test_function_run(automation_run_data: AutomationRunData, speckle_token: str
     automation_context = AutomationContext.initialize(
         automation_run_data, speckle_token
     )
+    print(f"Last function automation run data: {automation_run_data}")
+    print(f"Autiomation run data: {automation_run_data}")
     automate_sdk = run_function(
         automation_context,
         automate_function,
         FunctionInputs(
-            forbidden_speckle_type="Base", whisper_message="testing automatically"
+            user_token=os.getenv("SPECKLE_TOKEN")
         ),
     )
 
