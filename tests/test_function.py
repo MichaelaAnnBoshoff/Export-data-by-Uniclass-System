@@ -23,7 +23,7 @@ def test_function_run(test_automation_run_data: AutomationRunData, test_automati
         automation_context,
         automate_function,
         FunctionInputs(
-            user_token=SecretStr("5289563ac1f03e9ec06a105b7df9cf37638061ef1b"),
+            user_token=SecretStr("token"),
         ),
     )
 
