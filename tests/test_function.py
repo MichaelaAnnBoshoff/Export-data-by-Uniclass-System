@@ -1,210 +1,31 @@
 """Run integration tests with a speckle server."""
-import os
-import ssl
-import secrets
-import string
-
-from specklepy.logging.exceptions import SpeckleException
-
 import pytest
-from gql import gql
+from pydantic import SecretStr
+
 from speckle_automate import (
     AutomationContext,
     AutomationRunData,
     AutomationStatus,
-    run_function,
+    run_function
 )
-from specklepy.api import operations
-from specklepy.api.client import SpeckleClient
-from specklepy.objects.base import Base
-from specklepy.transports.server import ServerTransport
 
 from main import FunctionInputs, automate_function
 
-
-def crypto_random_string(length: int) -> str:
-    """Generate a semi crypto random string of a given length."""
-    alphabet = string.ascii_letters + string.digits
-    return "".join(secrets.choice(alphabet) for _ in range(length))
+from speckle_automate.fixtures import *
 
 
-def register_new_automation(
-    project_id: str,
-    model_id: str,
-    speckle_client: SpeckleClient,
-    automation_id: str,
-    automation_name: str,
-    automation_revision_id: str,
-):
-    """Register a new automation in the speckle server."""
-    query = gql(
-        """
-        mutation CreateAutomation(
-            $projectId: String! 
-            $modelId: String! 
-            $automationName: String!
-            $automationId: String! 
-            $automationRevisionId: String!
-        ) {
-                automationMutations {
-                    create(
-                        input: {
-                            projectId: $projectId
-                            modelId: $modelId
-                            automationName: $automationName 
-                            automationId: $automationId
-                            automationRevisionId: $automationRevisionId
-                        }
-                    )
-                }
-            }
-        """
-    )
-    params = {
-        "projectId": project_id,
-        "modelId": model_id,
-        "automationName": automation_name,
-        "automationId": automation_id,
-        "automationRevisionId": automation_revision_id,
-    }
-    try:
-        print(f"Speckle client/httpclient: {speckle_client}")
-        print(f"Query: {query}")
-        print(f"Params: {params}")
-        speckle_client.httpclient.execute(query, params)
-    except Exception as e:
-        print(f"Error during automation registration: {e}")
-        raise
-    # speckle_client.httpclient.execute(query, params)
-
-
-@pytest.fixture()
-def speckle_token() -> str:
-    """Provide a speckle token for the test suite."""
-    env_var = "SPECKLE_TOKEN"
-    token = os.getenv(env_var)
-    print(f"Token: {token}")
-    if not token:
-        raise ValueError(f"Cannot run tests without a {env_var} environment variable")
-    return token
-
-
-@pytest.fixture()
-def speckle_server_url() -> str:
-    """Provide a speckle server url for the test suite, default to localhost."""
-    return os.getenv("SPECKLE_SERVER_URL", "http://127.0.0.1:3000")
-
-
-@pytest.fixture()
-def speckle_ssl_cert() -> str:
-    """Provide a path to an SSL certificate for the test suite."""
-    env_var = "SPECKLE_SSL_CERT"
-    cert_path = os.getenv(env_var)
-    print(f"Cert path: {cert_path}")
-    if not cert_path:
-        raise ValueError(f"Cannot run tests without a {env_var} environment variable")
-    return cert_path
-
-# @pytest.fixture()
-# def test_client(speckle_server_url: str, speckle_token: str) -> SpeckleClient:
-#     """Initialize a SpeckleClient for testing."""
-#     test_client = SpeckleClient(
-#         speckle_server_url, speckle_server_url.startswith("https")
-#     )
-#     test_client.authenticate_with_token(speckle_token)
-#     return test_client
-
-@pytest.fixture()
-def test_client(speckle_server_url: str, speckle_token: str, speckle_ssl_cert: str) -> SpeckleClient:
-    """Initialize a SpeckleClient for testing with SSL certificate."""
-    os.environ['CURL_CA_BUNDLE'] = speckle_ssl_cert
-    
-    test_client = SpeckleClient(
-        speckle_server_url, speckle_server_url.startswith("https")
-    )
-    test_client.authenticate_with_token(speckle_token)
-    print(f"Test client speckle token: {speckle_token}")
-    print(f"Test client: {test_client}")
-    print(f"Test client info: {test_client.user}")
-    return test_client
-
-
-@pytest.fixture()
-def test_object() -> Base:
-    """Create a Base model for testing."""
-    root_object = Base()
-    root_object.foo = "bar"
-    return root_object
-
-
-@pytest.fixture()
-def automation_run_data(
-    test_object: Base, test_client: SpeckleClient, speckle_server_url: str
-) -> AutomationRunData:
-    """Set up an automation context for testing."""
-    project_id = test_client.stream.create("Automate function e2e test")
-    print(f"Project id: {project_id}")
-    branch_name = "main"
-
-    model = test_client.branch.get(project_id, branch_name, commits_limit=1)
-    model_id: str = model.id
-    print(f"Model id: {model_id}")
-    print(f"Second test client: {test_client}")
-    root_obj_id = operations.send(
-        test_object, [ServerTransport(project_id, test_client)]
-    )
-    print(f"Root object id: {root_obj_id}")
-    version_id = test_client.commit.create(project_id, root_obj_id)
-    print(f"Version id: {version_id}")
-    if isinstance(version_id, SpeckleException):
-        raise version_id
-
-    print(f"Third test client: {test_client}")
-    print(f"Test object: {test_object}")
-    automation_name = crypto_random_string(10)
-    automation_id = crypto_random_string(10)
-    automation_revision_id = crypto_random_string(10)
-
-    register_new_automation(
-        project_id,
-        model_id,
-        test_client,
-        automation_id,
-        automation_name,
-        automation_revision_id,
-    )
-    print("Register new automation successful!!!!!!!!! SUCCESS")
-    automation_run_id = crypto_random_string(10)
-    function_id = crypto_random_string(10)
-    function_revision = crypto_random_string(10)
-    return AutomationRunData(
-        project_id=project_id,
-        model_id=model_id,
-        branch_name=branch_name,
-        version_id=version_id,
-        speckle_server_url=speckle_server_url,
-        automation_id=automation_id,
-        automation_revision_id=automation_revision_id,
-        automation_run_id=automation_run_id,
-        function_id=function_id,
-        function_name=crypto_random_string(10),
-        function_logo=None,
-    )
-
-
-def test_function_run(automation_run_data: AutomationRunData, speckle_token: str):
+def test_function_run(test_automation_run_data: AutomationRunData, test_automation_token: str):
     """Run an integration test for the automate function."""
     automation_context = AutomationContext.initialize(
-        automation_run_data, speckle_token
+        test_automation_run_data, test_automation_token
     )
-    print(f"Last function automation run data: {automation_run_data}")
-    print(f"Autiomation run data: {automation_run_data}")
     automate_sdk = run_function(
         automation_context,
         automate_function,
         FunctionInputs(
-            user_token=os.getenv("SPECKLE_TOKEN")
+            user_token=SecretStr("5289563ac1f03e9ec06a105b7df9cf37638061ef1b"),
         ),
     )
 
-    assert automate_sdk.run_status == AutomationStatus.FAILED
+    assert automate_sdk.run_status == AutomationStatus.SUCCEEDED
+
