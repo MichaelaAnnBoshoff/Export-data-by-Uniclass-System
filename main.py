@@ -94,7 +94,9 @@ def automate_function(
 
 
     access_system_data = AccessSystemSpecificDataSpecklePy(model_url=model_url, project_id=project_id, server=server, token=token)
-    access_system_data.process_speckle_data()
+    # access_system_data.process_speckle_data()
+    systems_df = access_system_data.process_speckle_data()
+    access_system_data.export_to_excel(dataframes_dict=systems_df, excel_filename='systems_data.xlsx')
 
 
  
@@ -105,7 +107,7 @@ def automate_function(
     # # attached to the Speckle project / model
     # # automate_context.store_file_result("./report.pdf")
     
-    # automate_context.store_file_result("./systems_data.xlsx")
+    automate_context.store_file_result("./systems_data.xlsx")
     automate_context.mark_run_success("Data successfully extracted into Uniclass Systems.")
     # automate_context.set_context_view()
 
