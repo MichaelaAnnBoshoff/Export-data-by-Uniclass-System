@@ -180,14 +180,3 @@ class AccessSystemSpecificData:
         # self.export_to_excel(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx')
 
 
-    def create_random_dataframes(self, num_dfs, num_rows, num_cols):
-        dataframes_dict = {}
-        for i in range(num_dfs):
-            # Create a random DataFrame
-            df = pd.DataFrame(
-                np.random.rand(num_rows, num_cols),
-                columns=[f'col_{j+1}' for j in range(num_cols)]
-            )
-            # Add the DataFrame to the dictionary with a unique key
-            dataframes_dict[f'Sheet_{i+1}'] = df
-        return dataframes_dict

@@ -12,6 +12,8 @@ from specklepy.api.wrapper import StreamWrapper
 from specklepy.transports.server import ServerTransport
 from specklepy.serialization.base_object_serializer import BaseObjectSerializer
 
+from speckle_automate import AutomationContext
+
 from dotenv import load_dotenv
 from typing import Any, Dict, List, Tuple
 
@@ -269,6 +271,7 @@ class AccessSystemSpecificDataSpecklePy:
         systems_df = self.groupby_system_classification(data_df)
 
         self.export_to_excel(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx')
+        AutomationContext.store_file_result("./systems_data.xlsx")
 
 
 
