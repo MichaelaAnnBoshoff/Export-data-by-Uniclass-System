@@ -5,13 +5,14 @@ import json
 import os
 
 import pandas as pd
+import numpy as np
 
 from os.path import abspath
 from pathlib import Path
 from tqdm import tqdm
-from dotenv import load_dotenv
-from specklepy.api.client import SpeckleClient
-from specklepy.api.credentials import get_account_from_token
+# from dotenv import load_dotenv
+# from specklepy.api.client import SpeckleClient
+# from specklepy.api.credentials import get_account_from_token
 from speckle_automate import (
     AutomationContext
 )
@@ -24,6 +25,11 @@ class AccessSystemSpecificData:
         self.stream_id = stream_id
         self.server = server
         self.token = token
+
+        print(f"Access script stream url: {stream_url}")
+        print(f"Access script stream id: {stream_id}")
+        print(f"Access script server: {server}")
+        print(f"Access script token: {token}")
 
     def read_query(self, query_file):
         current_dir = Path(query_file).parent.absolute()
@@ -118,6 +124,7 @@ class AccessSystemSpecificData:
                     if isinstance(param_info, dict):
                         if param_info['name'] == 'Classification.Uniclass.Ss.Description':
                             classification_desc = param_info['value']
+                            print(f"Classification desc: {classification_desc}")
                         else:
                             param_label = param_info['name']
                             if param_info['units'] != None:
@@ -150,15 +157,37 @@ class AccessSystemSpecificData:
     def process_speckle_data(self):
         stream_query_variables = {"streamId": f"{self.stream_id}"}
         stream_json_response = self.get_query_response(query_file='GetStreamQuery.graphql', variables=stream_query_variables, query_name='Stream')
+        print(f"Stream response: {stream_json_response}")
+        
         commit_object_ids = self.get_list_of_commit_object_ids(stream_json_response)
+        print(f"Commit object ids: {commit_object_ids}")
 
         commit_query_variables = {"streamId": f"{self.stream_id}",
                             "objectId": commit_object_ids[0]}
         commit_response_json = self.get_query_response(query_file='GetCommitQuery.graphql', variables=commit_query_variables, query_name='Commit')
+        # print(f"Commit response: {commit_response_json}")
+        
         commit_data_dictionary = self.get_commit_data_dictionary(commit_response_json)
+        # print(f"Commit data dictionary: {commit_data_dictionary}")
         
         data_df = self.create_speckle_data_dataframe(commit_data_dictionary=commit_data_dictionary, commit_object_ids=commit_object_ids)
-
+        print(f"Data df: {data_df}")
         systems_df = self.groupby_system_classification(data_df)
+        print(f"Systems dataframe in access script: {systems_df}")
 
-        self.export_to_excel(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx')
+        return systems_df
+
+        # self.export_to_excel(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx')
+
+
+    def create_random_dataframes(self, num_dfs, num_rows, num_cols):
+        dataframes_dict = {}
+        for i in range(num_dfs):
+            # Create a random DataFrame
+            df = pd.DataFrame(
+                np.random.rand(num_rows, num_cols),
+                columns=[f'col_{j+1}' for j in range(num_cols)]
+            )
+            # Add the DataFrame to the dictionary with a unique key
+            dataframes_dict[f'Sheet_{i+1}'] = df
+        return dataframes_dict

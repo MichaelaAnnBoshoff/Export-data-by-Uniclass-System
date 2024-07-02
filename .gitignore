@@ -6,6 +6,8 @@ function_inputs.json
 **/.env
 **/.envrc
 
+**.xlsx
+
 **/.tool-versions
 
 ### PyCharm ###
