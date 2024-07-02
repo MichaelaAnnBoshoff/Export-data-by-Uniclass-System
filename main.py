@@ -105,7 +105,7 @@ def automate_function(
     # # attached to the Speckle project / model
     # # automate_context.store_file_result("./report.pdf")
     
-    automate_context.store_file_result("./systems_data.xlsx")
+    # automate_context.store_file_result("./systems_data.xlsx")
     automate_context.mark_run_success("Data successfully extracted into Uniclass Systems.")
     # automate_context.set_context_view()
 
