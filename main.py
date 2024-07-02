@@ -20,19 +20,19 @@ from specklepy.api.credentials import get_account_from_token
 
 # load_dotenv()
 
-# class FunctionInputs(AutomateBase):
-#     """These are function author defined values.
+class FunctionInputs(AutomateBase):
+    """These are function author defined values.
 
-#     Automate will make sure to supply them matching the types specified here.
-#     Please use the pydantic model schema to define your inputs:
-#     https://docs.pydantic.dev/latest/usage/models/
-#     """
+    Automate will make sure to supply them matching the types specified here.
+    Please use the pydantic model schema to define your inputs:
+    https://docs.pydantic.dev/latest/usage/models/
+    """
 
-#     user_token: SecretStr = Field(
-#         title="Insert your user token",
-#         description="The token should have read-write scope for streams."
-#                     "It will be used for authorization of graphQL."
-#                     )
+    user_token: SecretStr = Field(
+        title="Insert your user token",
+        description="The token should have read-write scope for streams."
+                    "It will be used for authorization of graphQL."
+                    )
 
 
 def automate_function(
@@ -114,6 +114,6 @@ if __name__ == "__main__":
     # NOTE: always pass in the automate function by its reference, do not invoke it!
 
     # pass in the function reference with the inputs schema to the executor
-    # execute_automate_function(automate_function, FunctionInputs)
+    execute_automate_function(automate_function, FunctionInputs)
     
-    execute_automate_function(automate_function)
+    # execute_automate_function(automate_function)
