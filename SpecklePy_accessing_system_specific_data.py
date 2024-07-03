@@ -260,8 +260,21 @@ class AccessSystemSpecificDataSpecklePy:
                 truncated_sheet_name = self.truncate_sheet_name(sheet_name)
                 df.to_excel(writer, sheet_name=truncated_sheet_name, index=False)
 
+    def export_to_excel_with_folder_path(self, dataframes_dict, excel_filename, folder_path):
+        # Ensure the folder exists
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        
+        # Combine the folder path and filename
+        full_path = os.path.join(folder_path, excel_filename)
+
+        with pd.ExcelWriter(excel_filename, engine='xlsxwriter') as writer:
+            for sheet_name, df in dataframes_dict.items():
+                truncated_sheet_name = self.truncate_sheet_name(sheet_name)
+                df.to_excel(writer, sheet_name=truncated_sheet_name, index=False)
+
     
-    def process_speckle_data(self):
+    def process_speckle_data(self, folder_path):
         client = self.get_speckle_client()
         version_object_id = self.get_version_object_id(client)
         transport, serializer = self.create_transport_and_serializer(client)
@@ -276,10 +289,11 @@ class AccessSystemSpecificDataSpecklePy:
         data_df = self.create_speckle_data_dataframe(id_data_dictionary=data_dictionary, version_object_id=version_object_id)
 
         systems_df = self.groupby_system_classification(data_df)
+
+        self.export_to_excel_with_folder_path(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx', folder_path=folder_path)
+
         return systems_df
 
-        # self.export_to_excel(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx', folder_path=folder_path)
-        # AutomationContext.store_file_result("./systems_data.xlsx")
 
 
 
