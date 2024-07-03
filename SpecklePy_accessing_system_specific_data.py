@@ -274,7 +274,8 @@ class AccessSystemSpecificDataSpecklePy:
                 df.to_excel(writer, sheet_name=truncated_sheet_name, index=False)
 
     
-    def process_speckle_data(self, folder_path):
+    # def process_speckle_data(self, folder_path):
+    def process_speckle_data(self):
         client = self.get_speckle_client()
         version_object_id = self.get_version_object_id(client)
         transport, serializer = self.create_transport_and_serializer(client)
@@ -290,7 +291,7 @@ class AccessSystemSpecificDataSpecklePy:
 
         systems_df = self.groupby_system_classification(data_df)
 
-        self.export_to_excel_with_folder_path(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx', folder_path=folder_path)
+        # self.export_to_excel_with_folder_path(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx', folder_path=folder_path)
 
         return systems_df
 

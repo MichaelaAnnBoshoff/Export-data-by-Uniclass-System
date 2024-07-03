@@ -93,7 +93,8 @@ def automate_function(
 
 
     access_system_data = AccessSystemSpecificDataSpecklePy(model_url=model_url, project_id=project_id, server=server, token=token)
-    systems_df = access_system_data.process_speckle_data(folder_path=DirectoryPath(function_inputs.folder_path))
+    # systems_df = access_system_data.process_speckle_data(folder_path=DirectoryPath(function_inputs.folder_path))
+    systems_df = access_system_data.process_speckle_data()
     print(f"Systems_df: {systems_df}")
     access_system_data.export_to_excel(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx')
     
