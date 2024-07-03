@@ -30,8 +30,7 @@ class FunctionInputs(AutomateBase):
 
     folder_path: DirectoryPath = Field(
         title="Insert the path to the folder where you want to save the Excel output.",
-        # description="The token should have read-write scope for streams."
-        #             "It will be used for authorization of graphQL."
+        # description="Ensure the folder path is enclosed in '' or  ""."
                     )
 
 
@@ -94,7 +93,7 @@ def automate_function(
 
 
     access_system_data = AccessSystemSpecificDataSpecklePy(model_url=model_url, project_id=project_id, server=server, token=token)
-    systems_df = access_system_data.process_speckle_data(folder_path=function_inputs.folder_path)
+    systems_df = access_system_data.process_speckle_data(folder_path=DirectoryPath(function_inputs.folder_path))
     print(f"Systems_df: {systems_df}")
     access_system_data.export_to_excel(dataframes_dict=systems_df, excel_filename='Systems_data.xlsx')
     
