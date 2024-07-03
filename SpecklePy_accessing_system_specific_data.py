@@ -268,7 +268,7 @@ class AccessSystemSpecificDataSpecklePy:
         # Combine the folder path and filename
         full_path = os.path.join(folder_path, excel_filename)
 
-        with pd.ExcelWriter(excel_filename, engine='xlsxwriter') as writer:
+        with pd.ExcelWriter(full_path, engine='xlsxwriter') as writer:
             for sheet_name, df in dataframes_dict.items():
                 truncated_sheet_name = self.truncate_sheet_name(sheet_name)
                 df.to_excel(writer, sheet_name=truncated_sheet_name, index=False)
