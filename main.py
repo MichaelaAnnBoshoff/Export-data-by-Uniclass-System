@@ -5,7 +5,7 @@ Use the automation_context module to wrap your function in an Autamate context h
 import os
 
 # from dotenv import load_dotenv
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, DirectoryPath 
 from speckle_automate import (
     AutomateBase,
     AutomationContext,
@@ -28,10 +28,10 @@ class FunctionInputs(AutomateBase):
     https://docs.pydantic.dev/latest/usage/models/
     """
 
-    user_token: SecretStr = Field(
-        title="Insert your user token",
-        description="The token should have read-write scope for streams."
-                    "It will be used for authorization of graphQL."
+    folder_path: DirectoryPath = Field(
+        title="Insert the path to the folder where you want to save the Excel output.",
+        # description="The token should have read-write scope for streams."
+        #             "It will be used for authorization of graphQL."
                     )
 
 
@@ -94,7 +94,7 @@ def automate_function(
 
 
     access_system_data = AccessSystemSpecificDataSpecklePy(model_url=model_url, project_id=project_id, server=server, token=token)
-    access_system_data.process_speckle_data()
+    access_system_data.process_speckle_data(folder_path=function_inputs.folder_path)
     
 
 
@@ -105,7 +105,7 @@ def automate_function(
     # # if the function generates file results, this is how it can be
     # # attached to the Speckle project / model
     # # automate_context.store_file_result("./report.pdf")
-    
+
     # automate_context.store_file_result("./systems_data.xlsx")
     automate_context.mark_run_success("Data successfully extracted into Uniclass Systems.")
     # automate_context.set_context_view()

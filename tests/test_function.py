@@ -1,7 +1,7 @@
 """Run integration tests with a speckle server."""
 import pytest
 import os
-from pydantic import SecretStr
+from pydantic import SecretStr, DirectoryPath
 
 from speckle_automate import (
     AutomationContext,
@@ -10,8 +10,8 @@ from speckle_automate import (
     run_function
 )
 
-# from main import FunctionInputs, automate_function
-from main import automate_function
+from main import FunctionInputs, automate_function
+# from main import automate_function
 
 from speckle_automate.fixtures import *
 
@@ -33,9 +33,9 @@ def test_function_run(test_automation_run_data: AutomationRunData, test_automati
     automate_sdk = run_function(
         automation_context,
         automate_function,
-        # FunctionInputs(
-        #     user_token=SecretStr(os.getenv("SPECKLE_TOKEN")),
-        # ),
+        FunctionInputs(
+            folder_path=DirectoryPath(os.getenv("folder_path")),
+        ),
     )
 
     assert automate_sdk.run_status == AutomationStatus.SUCCEEDED
