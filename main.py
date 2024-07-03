@@ -28,7 +28,7 @@ class FunctionInputs(AutomateBase):
     https://docs.pydantic.dev/latest/usage/models/
     """
 
-    folder_path: DirectoryPath = Field(
+    folder_path: str = Field(
         title="Insert the path to the folder where you want to save the Excel output.",
         # description="Ensure the folder path is enclosed in '' or  ""."
                     )
