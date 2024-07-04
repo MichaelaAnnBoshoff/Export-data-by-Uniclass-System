@@ -6,7 +6,7 @@ authors = ["Gergő Jedlicska <gergo@jedlicska.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 multidict = "^6.0.5"
 pytest = "<8.0.0"
 python-dotenv = "^1.0.1"
